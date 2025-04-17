@@ -1,0 +1,13 @@
+package org.mupro.exchanger;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class ExchangerBackApplicationTests {
+
+    @Test
+    void contextLoads() {
+    }
+
+}
