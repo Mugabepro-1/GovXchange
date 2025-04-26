@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin("http://localhost:8080")
 @RequestMapping("/api/swaps")
 public class SwapRequestController {
 

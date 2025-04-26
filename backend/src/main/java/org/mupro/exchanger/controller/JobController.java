@@ -16,7 +16,7 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @GetMapping
+    @GetMapping()
     public List<Job> getAllJobs() {
         return jobService.getAllJobs();
     }

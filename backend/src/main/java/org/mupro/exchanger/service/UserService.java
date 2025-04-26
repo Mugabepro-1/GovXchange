@@ -4,6 +4,7 @@ import org.mupro.exchanger.model.User;
 import org.mupro.exchanger.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,6 +19,8 @@ public class UserService {
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findByEmail(email);
     }
+
+    public List<User> getAllUsers(){ return userRepository.findAll(); }
 
     public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow();

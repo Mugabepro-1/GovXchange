@@ -29,6 +29,10 @@ public class SwapRequest {
         this.receiver = receiver;
         this.status = status;
     }
+    public SwapRequest(User sender, User receiver) {
+        this.sender = sender;
+        this.receiver = receiver;
+    }
     public SwapRequest(User sender, User receiver, SwapStatus status) {
         this.sender = sender;
         this.receiver = receiver;
