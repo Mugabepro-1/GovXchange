@@ -10,4 +10,6 @@ import java.util.List;
 public interface SwapRequestRepository extends JpaRepository<SwapRequest, Long> {
     List<SwapRequest> findByReceiverAndStatus(User receiver, SwapStatus status);
     List<SwapRequest> findByStatus(SwapStatus status);
+    List<SwapRequest> findBySender(User sender);
+    List<SwapRequest> findByReceiver(User receiver);
 }

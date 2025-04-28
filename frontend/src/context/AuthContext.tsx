@@ -8,10 +8,12 @@ export type UserRole = 'NORMALUSER' | 'ADMIN';
 export interface User {
   id: string;
   email: string;
+  name?: string;
   role: UserRole;
   address?: string;
   jobRole?: string;
   qualifications?: string[];
+  token?: string;
 }
 
 interface AuthContextType {
@@ -34,14 +36,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        const userData = await getCurrentUser();
-        if (userData) {
-          setUser(userData);
-          // Set authorization header for all future requests
-          api.defaults.headers.common['Authorization'] = `Basic ${btoa(`${userData.email}:${localStorage.getItem('tempPassword')}`)}`;
+        const token = localStorage.getItem('token');
+        if (token) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          const userData = await getCurrentUser();
+          if (userData) {
+            setUser(userData);
+          }
         }
       } catch (err) {
         console.error('Auth initialization error:', err);
+        // Clear invalid token
+        localStorage.removeItem('token');
+        delete api.defaults.headers.common['Authorization'];
       } finally {
         setIsLoading(false);
       }
@@ -56,12 +63,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const userData = await loginUser(email, password);
       setUser(userData);
-      // Store email for persistence (password is handled by the api service)
-      localStorage.setItem('email', email);
-      // Temporarily store password for Basic Auth (not secure, will be replaced with JWT)
-      localStorage.setItem('tempPassword', password);
-      // Set authorization header for all future requests
-      api.defaults.headers.common['Authorization'] = `Basic ${btoa(`${email}:${password}`)}`;
+      // Store token for persistence
+      if (userData.token) {
+        localStorage.setItem('token', userData.token);
+        api.defaults.headers.common['Authorization'] = `Bearer ${userData.token}`;
+      }
       toast.success('Login successful!');
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || 'Login failed. Please check your credentials.';
@@ -77,7 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(true);
     setError(null);
     try {
-      await api.post('/api/users/register', userData);
+      await api.post('/users/register', userData);
       toast.success('Registration successful! Please login.');
     } catch (err: any) {
       const errorMsg = err.response?.data?.message || 'Registration failed. Please try again.';
@@ -92,21 +98,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     logoutUser();
     setUser(null);
-    // Clear auth header
+    // Clear auth header and token
     delete api.defaults.headers.common['Authorization'];
+    localStorage.removeItem('token');
     toast.info('You have been logged out.');
   };
 
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        isAuthenticated: !!user, 
-        isLoading, 
-        login, 
-        register, 
-        logout, 
-        error
+    <AuthContext.Provider
+      value={{
+        user,
+        isAuthenticated: !!user,
+        isLoading,
+        login,
+        register,
+        logout,
+        error,
       }}
     >
       {children}

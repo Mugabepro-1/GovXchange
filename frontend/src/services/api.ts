@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api', // Updated to point to Spring Boot backend
+  baseURL: 'http://localhost:8080/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -41,10 +41,10 @@ api.interceptors.response.use(
       
       switch (status) {
         case 400:
-          errorMessage = error.response.data?.message || 'Bad request';
+          errorMessage = error.response.data?.message || 'Invalid request. Please check your input.';
           break;
         case 401:
-          errorMessage = 'Unauthorized - Please log in again';
+          errorMessage = 'Your session has expired. Please log in again.';
           // If we get a 401, we should log the user out
           if (window.location.pathname !== '/login') {
             // Clear stored credentials
@@ -57,20 +57,19 @@ api.interceptors.response.use(
           }
           break;
         case 403:
-          errorMessage = 'Access forbidden';
+          errorMessage = 'You do not have permission to perform this action.';
           break;
         case 404:
-          errorMessage = 'Resource not found';
+          errorMessage = 'The requested resource was not found.';
           break;
         case 500:
-          errorMessage = 'Server error - Please try again later';
+          errorMessage = 'A server error occurred. Please try again later.';
           break;
         default:
-          errorMessage = `Error ${status}: ${error.response.data?.message || 'Something went wrong'}`;
+          errorMessage = `Error: ${error.response.data?.message || 'Something went wrong'}`;
       }
     } else if (error.request) {
-      // Request was made but no response was received
-      errorMessage = 'No response from server - Please check your connection';
+      errorMessage = 'Unable to connect to the server. Please check your connection.';
     }
     
     // Only show toast for non-auth errors (auth component will handle those)

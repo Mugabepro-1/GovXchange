@@ -1,71 +1,48 @@
-import api from './api';
+import axios from 'axios';
+import { User } from '../context/AuthContext';
 
-interface LoginResponse {
-  id: string;
-  email: string;
-  role: string;
-  address?: string;
-  jobRole?: string;
-  qualifications?: string[];
-}
+const API_URL = 'http://localhost:8080/api';
 
-export const loginUser = async (email: string, password: string) => {
-  try {
-    // Create Basic Auth header
-    const authHeader = `Basic ${btoa(`${email}:${password}`)}`;
-    
-    // Make login request
-    const response = await api.post<LoginResponse>(
-      '/auth/login', // Updated to match Spring Security endpoint
-      {}, 
-      {
-        headers: {
-          'Authorization': authHeader
-        }
-      }
-    );
-    
+class AuthService {
+  async login(email: string, password: string): Promise<User> {
+    const response = await axios.post(`${API_URL}/users/login`, { email, password });
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data));
+    }
     return response.data;
-  } catch (error) {
-    console.error('Login error:', error);
-    throw error;
   }
-};
 
-export const getCurrentUser = async () => {
-  // Check if we have stored credentials
-  const email = localStorage.getItem('email');
-  const password = localStorage.getItem('tempPassword');
-  
-  if (!email || !password) return null;
-  
-  try {
-    // Create Basic Auth header
-    const authHeader = `Basic ${btoa(`${email}:${password}`)}`;
-    
-    // Get current user info
-    const response = await api.get<LoginResponse>(
-      '/users/me', // Updated to match Spring endpoint
-      {
-        headers: {
-          'Authorization': authHeader
-        }
-      }
-    );
-    
-    return response.data;
-  } catch (error) {
-    console.error('Get current user error:', error);
+  async register(name: string, email: string, password: string): Promise<void> {
+    await axios.post(`${API_URL}/users/register`, { name, email, password });
+  }
+
+  logout(): void {
+    localStorage.removeItem('user');
+    localStorage.removeItem('token');
+  }
+
+  getCurrentUser(): User | null {
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      return JSON.parse(userStr);
+    }
     return null;
   }
-};
 
-export const logoutUser = () => {
-  // Clear stored credentials
-  localStorage.removeItem('email');
-  localStorage.removeItem('tempPassword');
-};
+  isAuthenticated(): boolean {
+    return this.getCurrentUser() !== null;
+  }
 
-export const registerUser = async (userData: any) => {
-  return await api.post('/auth/register', userData); // Updated to match Spring endpoint
-};
+  isAdmin(): boolean {
+    const user = this.getCurrentUser();
+    return user?.role === 'ADMIN';
+  }
+}
+
+export const loginUser = (email: string, password: string) => new AuthService().login(email, password);
+export const registerUser = (name: string, email: string, password: string) => new AuthService().register(name, email, password);
+export const logoutUser = () => new AuthService().logout();
+export const getCurrentUser = () => new AuthService().getCurrentUser();
+
+export default new AuthService();

@@ -136,7 +136,7 @@ const AdminDashboard = () => {
                       {pendingSwaps.slice(0, 5).map((swap) => (
                         <div key={swap.id} className="p-4 border rounded-lg">
                           <div className="flex justify-between">
-                            <span className="font-medium">Swap #{swap.id.substring(0, 8)}</span>
+                            <span className="font-medium">Swap #{String(swap.id).substring(0, 8)}</span>
                             <span className="px-2 py-1 text-xs rounded-full bg-warning-100 text-warning-700">
                               {swap.status}
                             </span>

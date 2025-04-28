@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -32,19 +32,17 @@ const LoginPage = () => {
     resolver: yupResolver(schema),
   });
 
-  // Redirect if already authenticated
-  if (isAuthenticated) {
-    navigate(user?.role === 'ADMIN' ? '/admin-dashboard' : '/user-dashboard');
-    return null;
-  }
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(user?.role === 'ADMIN' ? '/admin-dashboard' : '/user-dashboard');
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const onSubmit = async (data: LoginFormInputs) => {
     setIsLoading(true);
     try {
       await login(data.email, data.password);
-      // Redirect happens automatically in the useEffect in AuthContext
     } catch (error) {
-      // Error is handled by AuthContext and displayed via toast
       console.error('Login error:', error);
     } finally {
       setIsLoading(false);
@@ -98,9 +96,9 @@ const LoginPage = () => {
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="font-medium text-primary-600 hover:text-primary-500"
+                  className="text-primary-600 hover:text-primary-700 font-medium"
                 >
-                  Register
+                  Register here
                 </Link>
               </p>
             </div>

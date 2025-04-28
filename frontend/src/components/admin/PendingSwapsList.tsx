@@ -120,20 +120,28 @@ const PendingSwapsList = ({ pendingSwaps, onSwapUpdated }: PendingSwapsListProps
                     </div>
                     
                     <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-3 lg:self-center">
-                      <Button 
-                        variant="success" 
-                        icon={<CheckCircle2 className="h-4 w-4" />}
-                        onClick={() => handleOpenModal(swap, 'approve')}
-                      >
-                        Approve
-                      </Button>
-                      <Button 
-                        variant="error" 
-                        icon={<XCircle className="h-4 w-4" />}
-                        onClick={() => handleOpenModal(swap, 'reject')}
-                      >
-                        Reject
-                      </Button>
+                      {swap.status === 'CONFIRMED' ? (
+                        <>
+                          <Button 
+                            variant="success" 
+                            icon={<CheckCircle2 className="h-4 w-4" />}
+                            onClick={() => handleOpenModal(swap, 'approve')}
+                          >
+                            Approve
+                          </Button>
+                          <Button 
+                            variant="error" 
+                            icon={<XCircle className="h-4 w-4" />}
+                            onClick={() => handleOpenModal(swap, 'reject')}
+                          >
+                            Reject
+                          </Button>
+                        </>
+                      ) : (
+                        <span className="text-sm text-warning-600">
+                          Waiting for user confirmation
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>
