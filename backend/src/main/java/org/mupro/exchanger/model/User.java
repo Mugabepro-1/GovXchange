@@ -114,3 +114,7 @@ public class User {
     }
 }
 
+//Done with every endpoint needed so now am left with configuring
+//security and after that all works create the frontend
+//and the final step is integration and testing
+

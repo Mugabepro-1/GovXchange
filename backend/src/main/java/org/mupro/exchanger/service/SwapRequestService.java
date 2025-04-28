@@ -45,5 +45,9 @@ public class SwapRequestService {
         request.setStatus(SwapStatus.REJECTED);
         return swapRequestRepository.save(request);
     }
+
+    public List<SwapRequest> getPendingSwaps() {
+        return swapRequestRepository.findByStatus(SwapStatus.PENDING);
+    }
 }
 

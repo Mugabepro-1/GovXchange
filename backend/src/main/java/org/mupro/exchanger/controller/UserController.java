@@ -2,9 +2,12 @@ package org.mupro.exchanger.controller;
 
 import org.mupro.exchanger.model.User;
 import org.mupro.exchanger.service.UserService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin("http://localhost:8080")
@@ -30,6 +33,12 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
         return userService.getUserById(id);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<Optional<User>> getProfile(@AuthenticationPrincipal org.springframework.security.core.userdetails.User userDetails){
+        Optional<User> user = userService.getUserByEmail(userDetails.getUsername());
+        return ResponseEntity.ok(user);
     }
 }
 

@@ -4,6 +4,7 @@ import org.mupro.exchanger.model.SwapRequest;
 import org.mupro.exchanger.model.User;
 import org.mupro.exchanger.service.SwapRequestService;
 import org.mupro.exchanger.service.UserService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -47,6 +48,12 @@ public class SwapRequestController {
     public List<SwapRequest> getRequestsForReceiver(@PathVariable Long receiverId) {
         User receiver = userService.getUserById(receiverId);
         return swapRequestService.getRequestsForReceiver(receiver);
+    }
+
+    @GetMapping("/pending")
+    public ResponseEntity<List<SwapRequest>> getPendingSwaps() {
+        List<SwapRequest> pending = swapRequestService.getPendingSwaps();
+        return ResponseEntity.ok(pending);
     }
 }
 
